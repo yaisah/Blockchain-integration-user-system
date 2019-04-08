@@ -1,0 +1,111 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+
+        .mystyle {
+            color: #bc5a45;
+        }
+
+        body {
+            background-color: #f4e1d2;
+        }
+
+        h1 {
+            color: #bc5a45;
+        }
+
+        h2 {
+            color: #f18973;
+        }
+
+        p {
+            font-family: arial;
+            color: #f18973;
+            font-size: 110%;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            height: 200px;
+        }
+
+        th {
+            color: #bc5a45;
+        }
+
+        td, th {
+            border: 1px solid #bc5a45;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f18973;
+        }
+    </style>
+    <title>Username List</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>                                  
+<body>
+    <h1>Users System</h1>
+
+    <!-- This DIV will be filled with the JSON data-->
+    <div class="mystyle"><div id='outputField' >
+    </div></div>
+    <!-- This script block has the Javascript logic -->
+    <script type="text/javascript" language="javascript">
+        //Document.ready waits for the page to finish loading then executes the code block
+        $(document).ready(function () {
+            //use the getJson function of jQuery to read from a REST API endpoint
+            //GET for username asset
+            $.getJSON('http://148.100.4.122:3000/api/org.acme.sample.UsernameAsset', function (data) {
+                // begin accessing JSON data here
+                //Dump all of the data coming back from the REST API to the log for debugging
+                console.log(data);
+
+                //Outputting the length of the array to know how many assets to loop through
+                console.log(data.length);
+                for (var i = 0; i < data.length; i++) {
+                    //Outputting to the console for debugging
+                    //I made it pink to organize each record and quickly find it
+                    console.log("%cYaisah's Record!", "color: pink; font-size:15px;");
+                    console.log("username: ", data[i].username);
+                    console.log("systemname: ", data[i].systemName);
+                    //use the split function to grab the name after the split
+                    var shortOwner = data[i].owner.split("#");
+                    shortOwner = shortOwner[1];
+                    console.log("shortOwner: ", shortOwner);
+                    //Appending actual HTML content to the "outputField" div
+                    $('#outputField').append("<p>",  i,);
+                    $('#outputField').append(". ", data[i].username, "</p>");
+                    
+                    //Run the subfunction for each "owner" to get their information related to the ticket
+                    getOwnerInfo(shortOwner);
+
+                };
+            });
+
+            //This is in case there is a participant with emails entered in the blockchain, otherwise it is expected to be empty
+            function getOwnerInfo(ownerID) {
+                console.log("Getting User Info: ", ownerID);
+                var apiEndPoint = "http://148.100.4.122:3000/api/org.acme.sample.User" + ownerID;
+                console.log("Endpoint Address: ", apiEndPoint);
+
+                $.getJSON(apiEndPoint, function (ownerData) {
+                    console.log('Updating Owner Information Addresses')
+                    //Dump all of the data coming back from the REST API to the log for debugging
+                    console.log(ownerData);
+                    console.log("ownerdata: ", ownerData.email);
+                    //Create the "search term" for the unique ticket owner class created in step above
+                    //Then update the HTML contents of that specific span tag with owner specific info
+                    var spanclass = '.systemName_' + ownerID;
+                    $(spanclass).html("Email: " + ownerData.email);
+                });
+
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .mystyle {
+                color: #bc5a45;
+            }
+        body {
+            background-color: #f4e1d2;
+        }
+        h1 {
+            color: #bc5a45;
+        }
+        h2 {
+            color: #f18973;
+            font-size: 16px;
+
+        }
+        h3 {
+            color: #bc5a45;
+            line-height: 5px;
+            font-weight: normal;
+        }
+        p  {
+            color: #b2b2b2;
+            font-style: italic;
+            font-family: arial;
+            font-size: 9px;
+        }
+
+        .button {
+            background-color: #bc5a45;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        </style>
+        <title>Username Input</title>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+            <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <body>
+       <h1>Add User</h1>
+       <!-- The div that will get updated with results -->
+       <div id='userDiv'></div>
+    
+       <!-- This form will contain all of the input boxes and submit button required to add a new user participant to the page-->
+       <form>
+           <h2>Use this section to add a new user to the system. </h2></br>
+           <h3>User ID:</h3>   <input id="userId" type="text">
+               <p>This field is your unique UserID</p>
+               <h3>First Name:</h3>   <input id="firstName" type="text">
+                   <p>Enter your legal first name.</p>
+                   <h3>Last Name:</h3>    <input id="lastName" type="text">
+                       <p>Enter your legal last name.</p>
+                       <h3>Email:</h3>    <input id="email" type="text">
+                           <p>Enter your preferred email address.</p>
+                           <br><br>
+                           <!-- Cool button made by Yaisah-->
+                           <a href="#" class="button" id='submit'>Submit</a>
+       </form>
+
+       <script>
+           //Pass a json data as postData
+           function postUserData () {
+               //Grab the variables from the form using the jquery search for their ID
+               //and using the built in .val() function to get the contents
+               var userId = $('#userId').val();
+               var firstName= $('#firstName').val();
+               var lastName = $('#lastName').val();
+               var email = $('#email').val();
+               
+               //Output the values to the console for debugging purposes
+               console.log(userId);
+               console.log(firstName);
+               console.log(lastName);
+               console.log(email);
+               
+               //Create a data object that is in the same format as the REST API expected parameters
+               theData = {
+                   "$class": "org.acme.sample.User",
+                   "userId": userId,
+                   "firstName": firstName,
+                   "lastName": lastName,
+                   "email": email
+               }
+               
+               //Output the data to the console for debugging purposes
+               console.log(theData);
+               
+               //AJAX function that runs in parallel as the page is loading and posts the JSON
+               $.ajax({
+                      // the URL for the request
+                      url: " http://148.100.4.122:3000/api/org.acme.sample.User",
+                      // whether this is a POST or GET request
+                      type: "POST",
+                      //the type of the data being sent to the REST API
+                      dataType: "json",
+                      //the name of the data we will send or get back
+                      data: theData,
+                      // If this REST API call executes successfully run this function
+                      success: function (user) {
+                      var param = $.param(user);
+                      console.log(param);
+                      $('#userDiv').append("<h3>Success! Ticket Added</h3>");
+                      },
+                      // If this REST API call executes unsuccessfully run this function
+                      error: function (xhr, status) {
+                      // code run if request fails; raw request and status
+                      console.log("Oh no! There was a problem. Check for duplicates.");
+                      console.log(status);
+                      console.log(xhr);
+                      },
+                      // Run this function regardless of success or failure
+                      complete: function (xhr, status) {
+                      console.log("Done!");
+                      }
+                      });
+           }
+       
+       //jQuery shorthand to wait for the webpage to finish loading before running the following script
+       $( document ).ready(function() {
+                           //All functions are now running based on a click of the #clickhere object
+                           $('#submit').click(function() {
+                                                 console.log('Button Clicked');
+                                                 postUserData();
+                                                 });
+                           });
+           </script>
+  </body>
+</html>
